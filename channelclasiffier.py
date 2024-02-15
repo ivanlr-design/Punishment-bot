@@ -4,7 +4,7 @@ from discord import app_commands
 import time
 bot = commands.Bot(command_prefix="-",intents=discord.Intents.all())
 
-token = 'MTIwNTgxNTk1ODE5MTYwMzcyMg.GrS6GG.ldnIYA6jWwEcj2BpZ5oYPmPw8zXaE-iedv0H4A'
+token = 'HERE YOUR TOKEN'
 meshticketId = 1205818053397315634
 meshStructuresId = 1205821986706690049
 ticketsId = 1205817944240824331
