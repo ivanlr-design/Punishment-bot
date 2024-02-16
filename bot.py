@@ -14,7 +14,8 @@ import asyncio
 from Utils.AuthUsers import get_authorized_users
 from Utils.MakeUID import MakeUID
 from Utils.GetTime import GetTime
-from src.GlobalVar import Support1,Support2,Support3,Support4,In_channel_1,In_channel_2,In_channel_3,In_channel_4,HelpList,v1patchnote,current_version
+from Utils.ChannelAutoRol import GetAllMembers
+from Utils.GlobalVar import HelpList,v1patchnote,current_version
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv(".env")
@@ -25,93 +26,11 @@ cred_file = os.getenv("Certificate")
 token = os.getenv("TokenBot")
 
 bot = commands.Bot(command_prefix=".",intents=discord.Intents.all())
-
-
-
-async def GetAllMembers():
-    for guild in bot.guilds:
-        voice_channel = discord.utils.get(guild.voice_channels, id=Support1)
-        Sup2 = discord.utils.get(guild.voice_channels, id=Support2)
-        Sup3 = discord.utils.get(guild.voice_channels, id=Support3)
-        Sup4 = discord.utils.get(guild.voice_channels, id=Support4)
-        if voice_channel:
-            members = voice_channel.members
-            for member in members:
-                if member.name not in In_channel_1:
-                    In_channel_1.append(member.name)
-                    for guild in bot.guilds:
-                        role = discord.utils.get(guild.roles, name="Support 1")
-                        member = discord.utils.get(guild.members, name=member.name)
-                        if role and member:
-                            await member.add_roles(role)
-            for user in In_channel_1:
-                if str(user) not in str(members):
-                    role = discord.utils.get(guild.roles, name="Support 1")
-                    member = discord.utils.get(guild.members, name=user)
-                    if role and member:
-                        await member.remove_roles(role)
-                        In_channel_1.remove(user)
-        if Sup2:
-            members = Sup2.members
-            for member in members:
-                if member.name not in In_channel_2:
-                    In_channel_2.append(member.name)
-                    for guild in bot.guilds:
-                        role = discord.utils.get(guild.roles, name="Support 2")
-                        member = discord.utils.get(guild.members, name=member.name)
-                        if role and member:
-                            await member.add_roles(role)
-
-            for user in In_channel_2:
-                if str(user) not in str(members):
-                    role = discord.utils.get(guild.roles, name="Support 2")
-                    member = discord.utils.get(guild.members, name=user)
-                    if role and member:
-                        await member.remove_roles(role)
-                        In_channel_2.remove(user)
-        
-        if Sup3:
-            members = Sup3.members
-            for member in members:
-                if member.name not in In_channel_3:
-                    In_channel_3.append(member.name)
-                    for guild in bot.guilds:
-                        role = discord.utils.get(guild.roles, name="Support 3")
-                        member = discord.utils.get(guild.members, name=member.name)
-                        if role and member:
-                            await member.add_roles(role)
-
-            for user in In_channel_3:
-                if str(user) not in str(members):
-                    role = discord.utils.get(guild.roles, name="Support 3")
-                    member = discord.utils.get(guild.members, name=user)
-                    if role and member:
-                        await member.remove_roles(role)
-                        In_channel_3.remove(user)
-        
-        if Sup4:
-            members = Sup4.members
-            for member in members:
-                if member.name not in In_channel_4:
-                    In_channel_4.append(member.name)
-                    for guild in bot.guilds:
-                        role = discord.utils.get(guild.roles, name="Support 4")
-                        member = discord.utils.get(guild.members, name=member.name)
-                        if role and member:
-                            await member.add_roles(role)
-
-            for user in In_channel_4:
-                if str(user) not in str(members):
-                    role = discord.utils.get(guild.roles, name="Support 4")
-                    member = discord.utils.get(guild.members, name=user)
-                    if role and member:
-                        await member.remove_roles(role)
-                        In_channel_4.remove(user)
         
 async def StartListening():
 
     while True:
-        await GetAllMembers()
+        await GetAllMembers(bot)
         await asyncio.sleep(0.2)
 
 allowed_users = []
