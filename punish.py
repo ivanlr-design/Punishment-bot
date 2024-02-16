@@ -12,13 +12,9 @@ import string
 import asyncio
 from dotenv import load_dotenv, dotenv_values
 
-config = {
-    **dotenv_values(".env.shared"),
-    **dotenv_values(".env.secret"),
-    **os.environ 
-}
+load_dotenv(".env")
 
-print(config)
+print(os.getenv("key"))
 
 time.sleep(10000)
 lowercase = string.ascii_lowercase
