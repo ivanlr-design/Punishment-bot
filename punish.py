@@ -7,52 +7,26 @@ from firebase_admin import db, credentials
 import time
 from discord import app_commands
 import random
+import json
 import typing
 import string
 import asyncio
+from Utils.AuthUsers import get_authorized_users
+from Utils.MakeUID import MakeUID
+from Utils.GetTime import GetTime
+from src.GlobalVar import Support1,Support2,Support3,Support4,In_channel_1,In_channel_2,In_channel_3,In_channel_4,HelpList,v1patchnote,current_version
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv(".env")
 
-print(os.getenv("key"))
-
-time.sleep(10000)
-lowercase = string.ascii_lowercase
-uppercase = string.ascii_uppercase
-
-def MakeUID(lenght=19):
-    final_uid = ""
-    for number in range(1,lenght+1):
-        if number % 5 == 0:
-            final_uid += "-"
-        elif number % 2 == 0:
-            final_uid += random.choice(lowercase)
-        else:
-            final_uid += random.choice(uppercase)
-    
-    return final_uid
-
-def GetTime():
-    now = datetime.datetime.now()
-
-    return now.strftime("%d/%m/%Y %H:%M")
-
 databaseUrl = "https://db-wanab-default-rtdb.europe-west1.firebasedatabase.app/"
 
-cred_file = "cred.json"
-token = 'HERE YOUR BOT TOKEN'
+cred_file = os.getenv("Certificate")
+token = os.getenv("TokenBot")
 
 bot = commands.Bot(command_prefix=".",intents=discord.Intents.all())
 
-In_channel_1 = []
-In_channel_2 = []
-In_channel_3 = []
-In_channel_4 = []
 
-Support1 = 928325966600761376
-Support2 = 960193798460297246
-Support3 = 960193866554822736
-Support4 = 1024761069610213496
 
 async def GetAllMembers():
     for guild in bot.guilds:
@@ -134,80 +108,23 @@ async def GetAllMembers():
                         await member.remove_roles(role)
                         In_channel_4.remove(user)
         
-
 async def StartListening():
 
     while True:
         await GetAllMembers()
         await asyncio.sleep(0.2)
-current_version = "v1.2.0"
-
-v1patchnote = '''
-```
-V1.0.0 PATCH
-    -Added a new form of security (Authorized users)
-    -Added searchfortribeid <tribe id>
-    -Added searchfortribename <tribe name>
-    -Added .reload (not slash command)
-    -Added punishment <Steam IDs> <Names> <Tribe Name> <Tribe ID> <Warning type> <Warnings> <Reason> <Punishment> <Proof>
-
-V1.0.5 PATCH
-    -Recoded punishment system
-    -Added support for multiple warnings
-
-V1.1.0 PATCH   
-    -Added removepunishment <warning_uid> function!
-    -Patched some bugs in punishment function
-    -Added totalwarnings <Tribe Name> function!
-
-V1.1.5 PATCH
-    -Added wipeseasonalwarnings (wipes punishments related to seasonal warnings for wipes) function!
-    -Added check <Id> function!
-
-V1.2.0 PATCH
-    -Mixed searchfortribename and searchfortribeid -> searchforpunishment <Tribe Name or Tribe id>
-    -Added autoRoles in support channels
-```
-'''
-
-HelpList = '''```
-Help List
-
-/check <Id> (checks if a player is in punishment database)
-
-/patchnotes (gave out the patch notes)
-
-/punishment <Steam IDs> <Names> <Tribe Name> <Tribe ID> <Warning type> <Warnings> <Reason> <Punishment> <Proof> (Log a punishment)
-
-/removepunishment <punishment uid> (delete a punishment from database)
-
-/searchforpunishment <tribe name or tribe id> (Send tribe warnings)
-
-/totalwarnings <tribe name> (Send how many warning does a tribe has)
-
-/wipeseasonalwarnings (Deletes all seasonal warnings, usefull for wipes)
-
-```'''
-
-def get_authorized_users():
-    ids = db.reference("/AuthorizedUsers").get()
-
-    for id in ids:
-        name = ids[id]['name']
-        if name not in allowed_users:
-            allowed_users.append(name)
-
 
 allowed_users = []
 Owner = "ivanlr._1_45557"
 
 @bot.event
 async def on_ready():
+    global allowed_users
     try:
-        cred = credentials.Certificate(cred_file)
+        cred = credentials.Certificate(json.loads(cred_file))
         firebase_admin.initialize_app(cred, {"databaseURL" : databaseUrl})
         #db.reference("/AuthorizedUsers").update({1153415324591476887 : {"name":"ivanlr._1_45557"}})
-        get_authorized_users()
+        allowed_users = get_authorized_users()
         synced = await bot.tree.sync()
         await StartListening()
     except Exception as e:
@@ -263,6 +180,7 @@ async def AddAuthorizedUser(ctx, username):
 
 @bot.tree.command(name="searchforpunishment")
 async def searchforpunishment(interaction : discord.Interaction, name_or_id : str):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="searchforpunishment FUNCTION",color=discord.Color.red())
@@ -356,7 +274,8 @@ async def patchnotes(interaction : discord.Interaction):
         
 @bot.command()
 async def reload(ctx):
-    get_authorized_users()
+    global allowed_users
+    allowed_users = get_authorized_users()
     embed = discord.Embed(title="Authorized Users",color=discord.Color.blue())
     for name in allowed_users:
         embed.add_field(name="NAME",value=name)
@@ -365,6 +284,7 @@ async def reload(ctx):
 
 @bot.tree.command(name="removepunishment")
 async def removepunishment(interaction : discord.Interaction, warning_uid : str):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="REMOVE PUNISHMENT FUNCTION",color=discord.Color.red())
@@ -396,6 +316,7 @@ async def removepunishment(interaction : discord.Interaction, warning_uid : str)
 
 @bot.tree.command(name="totalwarnings")
 async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="totalwarnings FUNCTION",color=discord.Color.red())
@@ -428,6 +349,7 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
 
 @bot.tree.command(name="wipeseasonalwarnings")
 async def wipeseasonalwarnings(interaction : discord.Interaction):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="Wipe Seasonal warnings FUNCTION",color=discord.Color.red())
@@ -475,6 +397,7 @@ async def wipeseasonalwarnings(interaction : discord.Interaction):
 
 @bot.tree.command(name="check")
 async def check(interaction : discord.Interaction, id : str):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="CHECK FUNCTION",color=discord.Color.red())
@@ -525,6 +448,7 @@ async def check(interaction : discord.Interaction, id : str):
     
 @bot.tree.command(name="punishment")
 async def punishment(interaction : discord.Interaction,steam_ids : str,names : str,tribe_name : str,tribe_id : int, warning_type : str, warnings : int,reason : str, punishment : str, proof : str):
+    global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
         embed = discord.Embed(title="PUNISHMENT FUNCTION",color=discord.Color.red())
