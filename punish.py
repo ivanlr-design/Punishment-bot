@@ -1,6 +1,6 @@
 from discord.ext import commands
 import datetime
-import sys
+import os
 import discord
 import firebase_admin
 from firebase_admin import db, credentials
@@ -10,7 +10,17 @@ import random
 import typing
 import string
 import asyncio
+from dotenv import load_dotenv, dotenv_values
 
+config = {
+    **dotenv_values(".env.shared"),
+    **dotenv_values(".env.secret"),
+    **os.environ 
+}
+
+print(config)
+
+time.sleep(10000)
 lowercase = string.ascii_lowercase
 uppercase = string.ascii_uppercase
 
