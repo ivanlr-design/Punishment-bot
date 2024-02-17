@@ -8,21 +8,10 @@ In_channel_2 = []
 In_channel_3 = []
 In_channel_4 = []
 
-current_version = "v1.2.0"
+current_version = "v1.2.5"
 
 v1patchnote = '''
 ```
-V1.0.0 PATCH
-    -Added a new form of security (Authorized users)
-    -Added searchfortribeid <tribe id>
-    -Added searchfortribename <tribe name>
-    -Added .reload (not slash command)
-    -Added punishment <Steam IDs> <Names> <Tribe Name> <Tribe ID> <Warning type> <Warnings> <Reason> <Punishment> <Proof>
-
-V1.0.5 PATCH
-    -Recoded punishment system
-    -Added support for multiple warnings
-
 V1.1.0 PATCH   
     -Added removepunishment <warning_uid> function!
     -Patched some bugs in punishment function
@@ -35,6 +24,11 @@ V1.1.5 PATCH
 V1.2.0 PATCH
     -Mixed searchfortribename and searchfortribeid -> searchforpunishment <Tribe Name or Tribe id>
     -Added autoRoles in support channels
+
+V1.2.5 PATCH
+    -Made all functions none Keysensitive
+    -Added earlypunishment (Gives the early punishment made) function
+    -Fixed some bugs with totalwarnings
 ```
 '''
 
@@ -55,4 +49,5 @@ Help List
 
 /wipeseasonalwarnings (Deletes all seasonal warnings, usefull for wipes)
 
+/earlypunishment (send the earlier punishment made)
 ```'''

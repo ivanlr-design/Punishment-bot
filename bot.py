@@ -11,11 +11,15 @@ import json
 import typing
 import string
 import asyncio
-from Utils.AuthUsers import get_authorized_users
+from Utils.database.AuthUsers import get_authorized_users
 from Utils.MakeUID import MakeUID
 from Utils.GetTime import GetTime
-from Utils.ChannelAutoRol import GetAllMembers
+from Utils.bot.ChannelAutoRol import GetAllMembers
+from Utils.GetEarlyTime import GetEarlyTime
+from Utils.GetIndex import GetIndex
 from Utils.GlobalVar import HelpList,v1patchnote,current_version
+from Utils.bot.Actions import GetActions
+from Utils.database.GetBans import GetBans
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv(".env")
@@ -54,14 +58,13 @@ async def on_ready():
 
 @bot.command()
 async def debug(ctx):
-    GetAllMembers(928325966600761376)
+    await GetActions(bot)
     await ctx.send("executed")
 
 @bot.command()
 async def AddAuthorizedUser(ctx, username):
     if str(ctx.author) != Owner:
-        embed = discord.Embed(title="Add Authorized User function",color=discord.Color.red())
-        embed.add_field(name="Error",value=f"Only Owner can add authorized users!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await ctx.send(embed=embed)
         return
     
@@ -95,23 +98,37 @@ async def AddAuthorizedUser(ctx, username):
         return
     
 
-
-
-@bot.tree.command(name="searchforpunishment")
-async def searchforpunishment(interaction : discord.Interaction, name_or_id : str):
+@bot.tree.command(name="searchforpunishment",description="Search for a punishment with tribe name/tribe id/uid")
+async def searchforpunishment(interaction : discord.Interaction, name_id_uid : str):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="searchforpunishment FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
 
     alldata = db.reference("/Punishments").get()
-
+    UIDS = []
+    
     try:
-        tribe_id = int(name_or_id)
+        alldata[name_id_uid]
+        UID = name_id_uid
+        embed = discord.Embed(title=alldata[UID]["Tribe Name"], color=discord.Color.greyple())
+        embed.add_field(name="Names",value=alldata[UID]["Names"],inline=True)
+        embed.add_field(name="Punishments",value=alldata[UID]["Punishment"],inline=True)
+        embed.add_field(name="Steam IDs",value=alldata[UID]["Steam IDs"],inline=True)
+        embed.add_field(name="Reason",value=alldata[UID]["Reason"],inline=True)
+        embed.add_field(name="Warning Type",value=alldata[UID]["Warning_type"],inline=True)
+        embed.add_field(name="Warnings",value=alldata[UID]["Warnings"],inline=True)
+        embed.add_field(name="Time",value=alldata[UID]["Time"],inline=True)
+        embed.set_footer(text=f"UID : {name_id_uid}")
+
+        await interaction.response.send_message(embed=embed)
+        return 
+    except Exception as e:
+        pass
+    try:
+        tribe_id = int(name_id_uid)
 
         embed = discord.Embed(title=tribe_id, color=discord.Color.greyple())
         warnings = 0
@@ -151,14 +168,14 @@ async def searchforpunishment(interaction : discord.Interaction, name_or_id : st
             UIDS = ', '.join(UIDS)
             embed.set_footer(text=f"UIDS : {UIDS} coded by Ivan")
     except:
-        tribe_name = str(name_or_id)
+        tribe_name = str(name_id_uid)
     
         embed = discord.Embed(title=tribe_name, color=discord.Color.greyple())
         warnings = 0
         UIDS = []
         found = False
         for UID in alldata:
-            if alldata[UID]["Tribe Name"] == tribe_name:
+            if str(alldata[UID]["Tribe Name"]).lower() == tribe_name.lower():
                 found = True
                 warnings += 1
                 embed.add_field(name=f"Warning {warnings}",value="",inline=False)
@@ -178,19 +195,6 @@ async def searchforpunishment(interaction : discord.Interaction, name_or_id : st
             embed.set_footer(text=f"UIDS : {UIDS} coded by Ivan")
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="help")
-async def help(interaction : discord.Interaction):
-    embed = discord.Embed(title="Help",color=discord.Color.green())
-    embed.add_field(name="Commands",value=HelpList)
-    await interaction.response.send_message(embed=embed)
-
-@bot.tree.command(name="patchnotes")
-async def patchnotes(interaction : discord.Interaction):
-    embed = discord.Embed(title=current_version, color=discord.Color.dark_orange())
-    embed.add_field(name="Version v1.2.0",value=v1patchnote,inline=False)
-    await interaction.response.send_message(embed=embed)
-    
-        
 @bot.command()
 async def reload(ctx):
     global allowed_users
@@ -201,14 +205,61 @@ async def reload(ctx):
 
     await ctx.send(embed=embed)
 
-@bot.tree.command(name="removepunishment")
+@bot.tree.command(name="help",description="Print help list")
+async def help(interaction : discord.Interaction):
+    embed = discord.Embed(title="Help",color=discord.Color.green())
+    embed.add_field(name="Commands",value=HelpList)
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="patchnotes",description="Print patchnotes")
+async def patchnotes(interaction : discord.Interaction):
+    embed = discord.Embed(title=current_version, color=discord.Color.dark_orange())
+    embed.add_field(name="Version v1.2.5",value=v1patchnote,inline=False)
+    await interaction.response.send_message(embed=embed)
+    
+@bot.tree.command(name="earlypunishment",description="Send the earlier punishment registered")
+async def earlypunishment(interaction : discord.Interaction):
+    global allowed_users
+    name = interaction.user.name
+    if str(name) not in allowed_users:
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
+        await interaction.response.send_message(embed=embed)
+        return
+    
+    times = []
+    uids = []
+    alldata = db.reference("/Punishments").get()
+    for uid in alldata:
+        time =alldata[uid]['Time']
+        time = time.replace("/"," ")
+        time = time.replace(":"," ")
+        times.append(time)
+        uids.append(uid)
+    
+    earlyTime = GetEarlyTime(times)
+    index = 0
+
+    index = GetIndex(earlyTime, times)
+    
+    data = alldata[uids[index]]
+
+    embed = discord.Embed(title=data["Tribe Name"],description=f"Date : {data['Time']}",color=discord.Color.green())
+    embed.add_field(name="Tribe ID",value=data['Tribe ID'],inline=True)
+    embed.add_field(name="Names",value=data['Names'],inline=True)
+    embed.add_field(name="Steam IDs",value=data['Steam IDs'],inline=True)
+    embed.add_field(name="Warning Type",value=data['Warning_type'],inline=True)
+    embed.add_field(name="Warnings",value=data['Warnings'],inline=True)
+    embed.add_field(name="Reason",value=data['Reason'],inline=True)
+    embed.add_field(name="Punishment",value=data['Punishment'],inline=True)
+    embed.set_footer(text=f"UID : {uids[index]}")
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="removepunishment", description="remove a punishment trought uid")
 async def removepunishment(interaction : discord.Interaction, warning_uid : str):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="REMOVE PUNISHMENT FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
 
@@ -233,14 +284,12 @@ async def removepunishment(interaction : discord.Interaction, warning_uid : str)
             embed = discord.Embed(title="Error while deleting warning from database!",description=f"Error : {e}, please contact ivanlr._1_45557 with a screenshot! ")
             await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="totalwarnings")
+@bot.tree.command(name="totalwarnings",description="Gives total warnings from a tribe")
 async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="totalwarnings FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
 
@@ -251,7 +300,7 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
     Verbal = 0
 
     for UID in alldata:
-        if alldata[UID]['Tribe Name'] == tribe_name:
+        if str(alldata[UID]['Tribe Name']).lower() == tribe_name.lower():
             if alldata[UID]['Warning_type'] == "Seasonal Warning":
                 Seasonal += alldata[UID]['Warnings']
             elif alldata[UID]['Warning_type'] == "Permanent Warning":
@@ -266,14 +315,12 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
 
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="wipeseasonalwarnings")
+@bot.tree.command(name="wipeseasonalwarnings",description="Wipe all seasonal warnings")
 async def wipeseasonalwarnings(interaction : discord.Interaction):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="Wipe Seasonal warnings FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
     
@@ -314,14 +361,12 @@ async def wipeseasonalwarnings(interaction : discord.Interaction):
     embed = discord.Embed(title="Done",description="```Done```",color=discord.Color.green())
     await msj.edit(embed=embed)
 
-@bot.tree.command(name="check")
+@bot.tree.command(name="check", description="Check if an Id is in database")
 async def check(interaction : discord.Interaction, id : str):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="CHECK FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
 
@@ -365,14 +410,12 @@ async def check(interaction : discord.Interaction, id : str):
         embed.add_field(name=f"",value=f"```Cannot find ID : {id} in punishments```",inline=False)
     await interaction.response.send_message(embed=embed)
     
-@bot.tree.command(name="punishment")
+@bot.tree.command(name="punishment",description="Make a punishment")
 async def punishment(interaction : discord.Interaction,steam_ids : str,names : str,tribe_name : str,tribe_id : int, warning_type : str, warnings : int,reason : str, punishment : str, proof : str):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
-        embed = discord.Embed(title="PUNISHMENT FUNCTION",color=discord.Color.red())
-        embed.add_field(name="Name",value=name)
-        embed.add_field(name="ERROR",value="You are not allowed to use this command!")
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
         await interaction.response.send_message(embed=embed)
         return
     
