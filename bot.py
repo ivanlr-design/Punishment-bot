@@ -229,23 +229,15 @@ async def getbans(interaction : discord.Interaction):
     bansUID = GetBans()
     alldata = db.reference("/Punishments").get()
 
-    embed = discord.Embed(title="BANS",color=discord.Color.red())
-
+    embed = discord.Embed(title=f"BANS",color=discord.Color.red())
     ban = 0
-    
-    for uid in bansUID:
+    for uid in alldata:
         embed.add_field(name=f"BAN {ban}",value="",inline=False)
-        embed.add_field(name="Steam IDs",value=alldata[uid]['Steam IDs'],inline=True)
-        embed.add_field(name="Name(s)",value=alldata[uid]['Names'],inline=True)
-        embed.add_field(name="Reason",value=alldata[uid]['Reason'],inline=True)
-        embed.add_field(name="Got banned at",value=alldata[uid]['Time'],inline=True)
+        embed.add_field(name=f"Name",value=alldata[uid]['Names'],inline=True)
         ban += 1
-    
-    channel = bot.get_channel(1202999872983273508)
-
     bansUID = ', '.join(bansUID)
     embed.set_footer(text=f"UIDS : {bansUID}")
-    await channel.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 @bot.tree.command(name="earlypunishment",description="Send the earlier punishment registered")
 async def earlypunishment(interaction : discord.Interaction):
