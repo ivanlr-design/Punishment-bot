@@ -2,7 +2,6 @@ import datetime
 from discord.ext import commands
 from firebase_admin import db
 import discord
-import re
 
 def GetTime():
     now = datetime.datetime.now()
@@ -20,7 +19,7 @@ async def SearchForTerminateBan(bot : commands.Bot):
             date = GetTime()
             
             print(date, str(data[uid]['Date']))
-            if re.findall(str(data[uid]['User']), date, re.IGNORECASE):
+            if str(data[uid]['Date']) == str(date):
                 print("MATCH")
                 name = str(data[uid]['User'])
                 user = discord.utils.get(bot.users, name=name)
