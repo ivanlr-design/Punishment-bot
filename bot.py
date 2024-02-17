@@ -240,10 +240,12 @@ async def getbans(interaction : discord.Interaction):
         embed.add_field(name="Reason",value=alldata[uid]['Reason'],inline=True)
         embed.add_field(name="Got banned at",value=alldata[uid]['Time'],inline=True)
         ban += 1
-        
+    
+    channel = bot.get_channel(1202999872983273502)
+
     bansUID = ', '.join(bansUID)
     embed.set_footer(text=f"UIDS : {bansUID}")
-    await interaction.response.send_message(embed=embed)
+    await channel.send(embed=embed)
 
 @bot.tree.command(name="earlypunishment",description="Send the earlier punishment registered")
 async def earlypunishment(interaction : discord.Interaction):
