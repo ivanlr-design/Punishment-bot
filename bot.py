@@ -234,7 +234,7 @@ async def getbans(interaction : discord.Interaction):
     ban = 0
 
     for uid in bansUID:
-        embed.add_field(name=f"BAN {ban}",inline=False)
+        embed.add_field(name=f"BAN {ban}",value="",inline=False)
         embed.add_field(name="Steam IDs",value=alldata[uid]['Steam IDs'],inline=True)
         embed.add_field(name="Name(s)",value=alldata[uid]['Names'],inline=True)
         embed.add_field(name="Reason",value=alldata[uid]['Reason'],inline=True)
