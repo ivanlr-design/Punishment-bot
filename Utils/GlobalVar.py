@@ -50,4 +50,8 @@ Help List
 /wipeseasonalwarnings (Deletes all seasonal warnings, usefull for wipes)
 
 /earlypunishment (send the earlier punishment made)
+
+/getbans (send all the banned users)
+
+
 ```'''
