@@ -241,7 +241,7 @@ async def getbans(interaction : discord.Interaction):
         embed.add_field(name="Got banned at",value=alldata[uid]['Time'],inline=True)
         ban += 1
     
-    channel = bot.get_channel(1202999872983273502)
+    channel = bot.get_channel(1202999872983273508)
 
     bansUID = ', '.join(bansUID)
     embed.set_footer(text=f"UIDS : {bansUID}")
