@@ -216,7 +216,24 @@ async def patchnotes(interaction : discord.Interaction):
     embed = discord.Embed(title=current_version, color=discord.Color.dark_orange())
     embed.add_field(name="Version v1.2.5",value=v1patchnote,inline=False)
     await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name="getbans",description="Send all banned users")
+async def getbans(interaction : discord.Interaction):
+    global allowed_users
+    name = interaction.user.name
+    if str(name) not in allowed_users:
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
+        await interaction.response.send_message(embed=embed)
+        return
     
+    bansUID = GetBans()
+    alldata = db.reference("/Punishments").get()
+
+    embed = discord.Embed(title="BANS",color=discord.Color.red())
+
+    for uid in bansUID:
+
+
 @bot.tree.command(name="earlypunishment",description="Send the earlier punishment registered")
 async def earlypunishment(interaction : discord.Interaction):
     global allowed_users
