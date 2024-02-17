@@ -9,7 +9,7 @@ from discord import app_commands
 import random
 import json
 import typing
-import string
+import re
 import asyncio
 from Utils.database.AuthUsers import get_authorized_users
 from Utils.MakeUID import MakeUID
@@ -20,21 +20,23 @@ from Utils.GetIndex import GetIndex
 from Utils.GlobalVar import HelpList,v1patchnote,current_version
 from Utils.bot.Actions import GetActions
 from Utils.database.GetBans import GetBans
+from Utils.bot.CheckForTempBans import SearchForTerminateBan
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv(".env")
 
 databaseUrl = "https://db-wanab-default-rtdb.europe-west1.firebasedatabase.app/"
-
+compiler = re.compile(r"[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-6][0-9]:[0-6][0-9]")
 cred_file = os.getenv("Certificate")
 token = os.getenv("TokenBot")
 
 bot = commands.Bot(command_prefix=".",intents=discord.Intents.all())
-        
+
 async def StartListening():
 
     while True:
         await GetAllMembers(bot)
+        await SearchForTerminateBan(bot)
         await asyncio.sleep(0.2)
 
 allowed_users = []
@@ -97,6 +99,41 @@ async def AddAuthorizedUser(ctx, username):
         await ctx.send(embed=embed)
         return
     
+@bot.tree.command(name="tempban",description="Temp ban a user, date example 16/02/2024 15:24")
+async def tempban(interaction : discord.Interaction, names : str, ids : str, tribename : str,warning_type : str, warnings : int,reason : str, punishment : str,proof : str, date:str):
+    global allowed_users
+    name = interaction.user.name
+    if str(name) not in allowed_users:
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
+        await interaction.response.send_message(embed=embed)
+        return
+
+    if re.match(compiler, date):
+        pass
+    else:
+        embed = discord.Embed(title="Date MUST be in the correct format, ex: 12/02/24",description="The numbers must be in two numbers always, this : 12/2/24 is INVALID, MUST be 12/02/24",color=discord.Color.red())
+        await interaction.response.send_message(embed=embed)
+        return 
+
+    uid = MakeUID()
+
+    try:
+        db.reference("/TempBans").update({uid : {"Tribe Name":tribename, "Names":names, "Steam IDs":ids, "Warning_type":warning_type, "Warnings":warnings,"Reason":reason,"Punishment":punishment,"Date":date, "User":interaction.user.name}})
+        embed = discord.Embed(title="TEMP BANNED",color= discord.Color.orange())
+        embed.add_field(name="Tribe Name",value=tribename,inline=False)
+        embed.add_field(name="Names",value=names,inline=False)
+        embed.add_field(name="Steam IDs",value=ids,inline=False)
+        embed.add_field(name="Warning Type",value=warning_type,inline=False)
+        embed.add_field(name="Warnings",value=warnings,inline=False)
+        embed.add_field(name="Reason",value=reason,inline=False)
+        embed.add_field(name="Punishment",value=punishment,inline=False)
+        embed.add_field(name="Proof",value=proof,inline=False)
+        embed.add_field(name="DATABASE STATUS",value="Succesfully added to database",inline=False)
+        embed.set_footer(text=f"UID : {uid}, coded by Ivan")
+    except Exception as e:
+        embed = discord.Embed(title="TEMP BANNED",description=f"Error while adding to database : {e}",color= discord.Color.red())
+    
+    await interaction.response.send_message(embed=embed)
 
 @bot.tree.command(name="searchforpunishment",description="Search for a punishment with tribe name/tribe id/uid")
 async def searchforpunishment(interaction : discord.Interaction, name_id_uid : str):
@@ -108,6 +145,7 @@ async def searchforpunishment(interaction : discord.Interaction, name_id_uid : s
         return
 
     alldata = db.reference("/Punishments").get()
+    tempbans = db.reference("/TempBans").get()
     UIDS = []
     
     try:
@@ -486,6 +524,20 @@ async def warn_autocomplete(interaction : discord.Interaction, current: int) -> 
     
     return data
 
+@tempban.autocomplete("warning_type")
+async def autocomplete(interaction : discord.Interaction, current : str) -> typing.List[app_commands.Choice[str]]:
+    data = []
+    for options in ["Seasonal Warning","Permanent Warning","Verbal Warning"]:
+        data.append(app_commands.Choice(name=options,value=options)) 
+    return data 
+
+@tempban.autocomplete("warnings")
+async def warn_autocomplete(interaction : discord.Interaction, current: int) -> typing.List[app_commands.Choice[int]]:
+    data = []
+    for number in [1,2,3,4,5]:
+        data.append(app_commands.Choice(name=number,value=number))
+    
+    return data
 
 
 bot.run(token)
