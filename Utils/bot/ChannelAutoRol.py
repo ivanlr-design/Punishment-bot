@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from ..GlobalVar import Support1,Support2,Support3,Support4,In_channel_1,In_channel_2,In_channel_3,In_channel_4
-
+from ..Debug.Messages import Alert,Succed,info
 async def GetAllMembers(bot : commands.Bot):
     for guild in bot.guilds:
         voice_channel = discord.utils.get(guild.voice_channels, id=Support1)
@@ -18,6 +18,7 @@ async def GetAllMembers(bot : commands.Bot):
                         member = discord.utils.get(guild.members, name=member.name)
                         if role and member:
                             await member.add_roles(role)
+                            Succed(f"Succesfully added {role.name} to {member.name} in Support 1!")
 
             for user in In_channel_1:
                 if str(user) not in str(members):
@@ -25,6 +26,7 @@ async def GetAllMembers(bot : commands.Bot):
                     member = discord.utils.get(guild.members, name=user)
                     if role and member:
                         await member.remove_roles(role)
+                        Succed(f"Succesfully removed {role.name} to {member.name} in Support 1!")
                         In_channel_1.remove(user)
         if Sup2:
             members = Sup2.members
@@ -35,6 +37,7 @@ async def GetAllMembers(bot : commands.Bot):
                         role = discord.utils.get(guild.roles, name="Support 2")
                         member = discord.utils.get(guild.members, name=member.name)
                         if role and member:
+                            Succed(f"Succesfully added {role.name} to {member.name} in Support 2!")
                             await member.add_roles(role)
 
             for user in In_channel_2:
@@ -43,6 +46,7 @@ async def GetAllMembers(bot : commands.Bot):
                     member = discord.utils.get(guild.members, name=user)
                     if role and member:
                         await member.remove_roles(role)
+                        Succed(f"Succesfully removed {role.name} to {member.name} in Support 2!")
                         In_channel_2.remove(user)
         
         if Sup3:
@@ -54,6 +58,7 @@ async def GetAllMembers(bot : commands.Bot):
                         role = discord.utils.get(guild.roles, name="Support 3")
                         member = discord.utils.get(guild.members, name=member.name)
                         if role and member:
+                            Succed(f"Succesfully added {role.name} to {member.name} in Support 3!")
                             await member.add_roles(role)
 
             for user in In_channel_3:
@@ -62,6 +67,7 @@ async def GetAllMembers(bot : commands.Bot):
                     member = discord.utils.get(guild.members, name=user)
                     if role and member:
                         await member.remove_roles(role)
+                        Succed(f"Succesfully removed {role.name} to {member.name} in Support 3!")
                         In_channel_3.remove(user)
         
         if Sup4:
@@ -73,6 +79,7 @@ async def GetAllMembers(bot : commands.Bot):
                         role = discord.utils.get(guild.roles, name="Support 4")
                         member = discord.utils.get(guild.members, name=member.name)
                         if role and member:
+                            Succed(f"Succesfully added {role.name} to {member.name} in Support 4!")
                             await member.add_roles(role)
 
             for user in In_channel_4:
@@ -81,4 +88,5 @@ async def GetAllMembers(bot : commands.Bot):
                     member = discord.utils.get(guild.members, name=user)
                     if role and member:
                         await member.remove_roles(role)
+                        Succed(f"Succesfully added {role.name} to {member.name} in Support 4!")
                         In_channel_4.remove(user)
