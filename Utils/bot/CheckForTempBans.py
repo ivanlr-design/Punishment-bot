@@ -47,7 +47,7 @@ def GetTime():
     return now.strftime("%d/%m/%Y %H:%M")
 
 async def SearchForTerminateBan(bot : commands.Bot):
-    log_channel = 1208151847974473889
+    log_channel = 1073357812786282536
 
     channel = bot.get_channel(log_channel)
     if channel:

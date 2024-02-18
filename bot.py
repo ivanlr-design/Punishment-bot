@@ -285,7 +285,7 @@ async def help(interaction : discord.Interaction):
 @bot.tree.command(name="patchnotes",description="Print patchnotes")
 async def patchnotes(interaction : discord.Interaction):
     embed = discord.Embed(title=current_version, color=discord.Color.dark_orange())
-    embed.add_field(name="Version v1.2.5",value=v1patchnote,inline=False)
+    embed.add_field(name="Version v1.3.0",value=v1patchnote,inline=False)
     await interaction.response.send_message(embed=embed)
 
 @bot.tree.command(name="getbans",description="Send all banned users")
