@@ -70,5 +70,4 @@ async def SearchForTerminateBan(bot : commands.Bot):
                         await channel.send(embed=embed,view=req)
                         await channel.send(user.mention)
             except Exception as e:
-                print(e)
                 pass
