@@ -435,6 +435,69 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
     info("totalwarnings was trigered")
     await interaction.response.send_message(embed=embed)
 
+@bot.tree.command(name="status",description="Wipe all seasonal warnings")
+async def status(interaction : discord.Interaction):
+    global allowed_users
+    name = interaction.user.name
+    if str(name) not in allowed_users:
+        embed = discord.Embed(title="Error",description="You are not allowed to use this command!",color=discord.Color.red())
+        await interaction.response.send_message(embed=embed)
+        return
+    
+    embed = discord.Embed(title=f"Punishment status")
+
+    data = db.reference("/Punishments").get()
+    Auth = db.reference("/AuthorizedUsers").get()
+
+    Punishments = len(data)
+
+    TotalSeasonals = 0
+    TotalPermanent = 0
+    TotalVerbals = 0
+
+    bannedUsers = []
+    
+    TotalUsers = len(Auth)
+
+    for uid in data:
+        if data[uid]['Warning_type'] == "Seasonal Warning":
+            try:
+                data[uid]['TempBan']
+            except:
+                TotalSeasonals += data[uid]['Warnings']
+        elif data[uid]['Warning_type'] == "Permanent Warning":
+            try:
+                data[uid]['TempBan']
+            except:
+                TotalPermanent += data[uid]['Warnings']
+        elif data[uid]['Warning_type'] == "Verbal Warning":
+            try:
+                data[uid]['TempBan']
+            except:
+                TotalVerbals += data[uid]['Warnings']
+        
+        if 'ban' in data[uid]['Punishment'].lower():
+            users = str(data[uid]['Names'])
+            splited = users.split("|")
+
+            for user in splited:
+                if user not in bannedUsers:
+                    bannedUsers.append(user)
+    
+    embed = discord.Embed(title=f"PUNISHMENT STADISTICS",description=f"Total Punishments : {Punishments}",color=discord.Color.dark_gold())
+
+    embed.add_field(name=f"Seasonals",value=TotalSeasonals,inline=True)
+    embed.add_field(name=f"Permanent",value=TotalPermanent,inline=True)
+    embed.add_field(name=f"Verbal",value=TotalVerbals,inline=True)
+
+    embed.add_field(name=f"Total banned users",value=len(bannedUsers),inline=False)
+    embed.add_field(name=f"Total Authorized users",value=TotalUsers,inline=False)
+
+    info(f"Fetched all punishment stadistics")
+
+    await interaction.response.send_message(embed=embed)
+
+
 @bot.tree.command(name="wipeseasonalwarnings",description="Wipe all seasonal warnings")
 async def wipeseasonalwarnings(interaction : discord.Interaction):
     global allowed_users
