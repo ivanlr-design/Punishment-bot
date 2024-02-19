@@ -652,9 +652,9 @@ async def information(interaction : discord.Interaction):
     
     embed = discord.Embed(title=f"PUNISHMENT STADISTICS",description=f"Total Punishments : {Punishments}",color=discord.Color.dark_gold())
 
-    embed.add_field(name=f"Seasonals",value=TotalSeasonals,inline=True)
-    embed.add_field(name=f"Permanent",value=TotalPermanent,inline=True)
-    embed.add_field(name=f"Verbal",value=TotalVerbals,inline=True)
+    embed.add_field(name=f"Seasonal warnings",value=TotalSeasonals,inline=True)
+    embed.add_field(name=f"Permanent warnings",value=TotalPermanent,inline=True)
+    embed.add_field(name=f"Verbal warnings",value=TotalVerbals,inline=True)
 
     embed.add_field(name=f"Total banned users",value=len(bannedUsers),inline=False)
     embed.add_field(name=f"Total Authorized users",value=TotalUsers,inline=True)
