@@ -52,10 +52,10 @@ async def on_ready():
         cred = credentials.Certificate(json.loads(cred_file))
         firebase_admin.initialize_app(cred, {"databaseURL" : databaseUrl})
         #db.reference("/AuthorizedUsers").update({1153415324591476887 : {"name":"ivanlr._1_45557"}})
+        synced = await bot.tree.sync()
         allowed_users = get_authorized_users()
         await StartListening()
         Succed("Started correctly")
-        synced = await bot.tree.sync()
     except Exception as e:
         Alert(f"Failed to start bot, error : {e}")
         channel = bot.get_channel(1202999872983273508)
