@@ -661,6 +661,7 @@ async def information(interaction : discord.Interaction):
     info(f"Fetched all punishment stadistics")
 
     await interaction.response.send_message(embed=embed)
+    
 
 @punishment.autocomplete("warning_type")
 async def autocomplete(interaction : discord.Interaction, current : str) -> typing.List[app_commands.Choice[str]]:
