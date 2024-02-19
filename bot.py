@@ -415,13 +415,18 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
     Verbal = 0
 
     for UID in alldata:
+        
         if str(alldata[UID]['Tribe Name']).lower() == tribe_name.lower():
-            if alldata[UID]['Warning_type'] == "Seasonal Warning":
-                Seasonal += alldata[UID]['Warnings']
-            elif alldata[UID]['Warning_type'] == "Permanent Warning":
-                Permanent += alldata[UID]['Warnings']
-            elif alldata[UID]['Warning_type'] == "Verbal Warning":
-                Verbal += alldata[UID]['Warnings']
+            try:
+                if alldata[UID]['TempBan'] == True:
+                    pass
+            except:
+                if alldata[UID]['Warning_type'] == "Seasonal Warning":
+                    Seasonal += alldata[UID]['Warnings']
+                elif alldata[UID]['Warning_type'] == "Permanent Warning":
+                    Permanent += alldata[UID]['Warnings']
+                elif alldata[UID]['Warning_type'] == "Verbal Warning":
+                    Verbal += alldata[UID]['Warnings']
     
     embed = discord.Embed(title=tribe_name, color=discord.Color.green())
     embed.add_field(name="Seasonal Warnings",value=Seasonal,inline=True)
