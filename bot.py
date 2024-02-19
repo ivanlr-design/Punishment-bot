@@ -102,7 +102,9 @@ async def AddAuthorizedUser(ctx, username):
         embed.add_field(name="Error",value=f"User {username} does not exist in discord server")
         await ctx.send(embed=embed)
         return
-    
+@bot.tree.command(name="test",description="Status from punishments")
+async def test(interaction : discord.Interaction):
+    await interaction.response.send_message("dawda")
 @bot.tree.command(name="tempban",description="Temp ban a user, date example 16/02/2024 15:24")
 async def tempban(interaction : discord.Interaction, names : str, ids : str, tribename : str,warning_type : str, warnings : int,reason : str, punishment : str,proof : str, date:str):
     global allowed_users
@@ -661,7 +663,7 @@ async def information(interaction : discord.Interaction):
     info(f"Fetched all punishment stadistics")
 
     await interaction.response.send_message(embed=embed)
-    
+
 
 @punishment.autocomplete("warning_type")
 async def autocomplete(interaction : discord.Interaction, current : str) -> typing.List[app_commands.Choice[str]]:
