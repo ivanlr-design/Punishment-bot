@@ -102,9 +102,8 @@ async def AddAuthorizedUser(ctx, username):
         embed.add_field(name="Error",value=f"User {username} does not exist in discord server")
         await ctx.send(embed=embed)
         return
-@bot.tree.command(name="test",description="Status from punishments")
-async def test(interaction : discord.Interaction):
-    await interaction.response.send_message("dawda")
+
+
 @bot.tree.command(name="tempban",description="Temp ban a user, date example 16/02/2024 15:24")
 async def tempban(interaction : discord.Interaction, names : str, ids : str, tribename : str,warning_type : str, warnings : int,reason : str, punishment : str,proof : str, date:str):
     global allowed_users
@@ -658,7 +657,7 @@ async def information(interaction : discord.Interaction):
     embed.add_field(name=f"Verbal",value=TotalVerbals,inline=True)
 
     embed.add_field(name=f"Total banned users",value=len(bannedUsers),inline=False)
-    embed.add_field(name=f"Total Authorized users",value=TotalUsers,inline=False)
+    embed.add_field(name=f"Total Authorized users",value=TotalUsers,inline=True)
 
     info(f"Fetched all punishment stadistics")
 
