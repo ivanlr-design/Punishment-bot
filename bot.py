@@ -435,8 +435,8 @@ async def totalwarnings(interaction : discord.Interaction, tribe_name : str):
     info("totalwarnings was trigered")
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="status",description="Wipe all seasonal warnings")
-async def status(interaction : discord.Interaction):
+@bot.tree.command(name="stats",description="Wipe all seasonal warnings")
+async def stats(interaction : discord.Interaction):
     global allowed_users
     name = interaction.user.name
     if str(name) not in allowed_users:
