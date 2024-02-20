@@ -1,7 +1,3 @@
-import re
+string = {"FGSE":{"Seasonal":0,"Perm":0,"Verb":0}}
 
-compiler = re.compile(r"[0-9][0-9]/[0-9][0-9]/[0-9][0-9] [0-6][0-9]:[0-6][0-9]")
-string = "12/02/24 40:32"
-
-if re.match(compiler, string):
-    print("dawd")
+print(string['FGSE']['Seasonal'])

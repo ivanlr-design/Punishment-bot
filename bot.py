@@ -6,7 +6,7 @@ import firebase_admin
 from firebase_admin import db, credentials
 import time
 from discord import app_commands
-import random
+import threading
 import json
 import typing
 import re
@@ -23,6 +23,7 @@ from Utils.bot.BanPage import BanPage
 from Utils.database.GetBans import GetBans
 from Utils.bot.CheckForTempBans import SearchForTerminateBan
 from Utils.Debug.Messages import Succed, info, Alert
+
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv(".env")
@@ -39,6 +40,7 @@ async def StartListening():
     while True:
         await GetAllMembers(bot)
         await SearchForTerminateBan(bot)
+        await GetActions(bot)
         await asyncio.sleep(0.2)
 
 allowed_users = []
@@ -142,7 +144,7 @@ async def tempban(interaction : discord.Interaction, names : str, ids : str, tri
     
     channel = bot.get_channel(991364879116153023)
 
-    await channel.send(f"Tribe Name: {tribename} has been TEMPBANNED, reason:{reason}, unban date:{date}")
+    #await channel.send(f"Tribe Name: {tribename} has been TEMPBANNED, reason:{reason}, unban date:{date}")
 
     await interaction.response.send_message(embed=embed)
 
@@ -397,8 +399,9 @@ async def removepunishment(interaction : discord.Interaction, warning_uid : str)
             embed.add_field(name="Tribe Name",value=tribe_name,inline=False)
             embed.add_field(name="Punishment",value=tribe_Punish,inline=False)
             embed.add_field(name="Reason",value=Reason,inline=False)
-            Succed(f"Succesfully removed {warning_uid} from database")
             await interaction.response.send_message(embed=embed)
+            Succed(f"Succesfully removed {warning_uid} from database")
+            
         except Exception as e:
             Alert(f"Error while trying to remove : {warning_uid} from database")
             embed = discord.Embed(title="Error while deleting warning from database!",description=f"Error : {e}, please contact ivanlr._1_45557 with a screenshot! ")
@@ -565,7 +568,13 @@ async def check(interaction : discord.Interaction, id_or_name : str):
         Alert(f"Cannot find {id_or_name} in database")
         embed.add_field(name=f"",value=f"```Cannot find ID : {id_or_name} in punishments```",inline=False)
     await interaction.response.send_message(embed=embed)
-    
+
+@bot.command()
+async def debug(ctx):
+    chat = bot.get_channel(991364879116153023)
+    await chat.send("test")
+    await ctx.send("done")
+
 @bot.tree.command(name="punishment",description="Make a punishment")
 async def punishment(interaction : discord.Interaction,steam_ids : str,names : str,tribe_name : str,tribe_id : int, warning_type : str, warnings : int,reason : str, punishment : str, proof : str):
     global allowed_users
@@ -601,10 +610,10 @@ async def punishment(interaction : discord.Interaction,steam_ids : str,names : s
 
         ing_chat = bot.get_channel(991364879116153023)
         
-        if 'ban' in punishment.lower():
-            await ing_chat.send(f"BAN: Tribe Name: {tribe_name} has been banned for : {reason}!")
-        else:
-            await ing_chat.send(f"PUNISHMENT: Tribe Name:{tribe_name} has been punished!, Warnings: {warnings}{warning_type}, Reason: {reason}")
+        #if 'ban' in punishment.lower():
+            #await ing_chat.send(f"BAN: Tribe Name: {tribe_name} has been banned for : {reason}!")
+        #else:
+            #await ing_chat.send(f"PUNISHMENT: Tribe Name:{tribe_name} has been punished!, Warnings: {warnings} {warning_type}, Reason: {reason}")
 
         return
     except Exception as e:
