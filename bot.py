@@ -140,6 +140,10 @@ async def tempban(interaction : discord.Interaction, names : str, ids : str, tri
         Alert(f"Failed to add {uid} (tempban) to database, error : {e}")
         embed = discord.Embed(title="TEMP BANNED",description=f"Error while adding to database : {e}",color= discord.Color.red())
     
+    channel = bot.get_channel(991364879116153023)
+
+    await channel.send(f"Tribe Name: {tribename} has been TEMPBANNED, reason:{reason}, unban date:{date}")
+
     await interaction.response.send_message(embed=embed)
 
 @bot.tree.command(name="searchforpunishment",description="Search for a punishment with tribe name/tribe id/uid")
@@ -594,6 +598,14 @@ async def punishment(interaction : discord.Interaction,steam_ids : str,names : s
         embed.set_thumbnail(url="https://th.bing.com/th/id/R.a1849d676a332b5516f3dd3cf3d90609?rik=XwaA15sdUDGrag&riu=http%3a%2f%2fwww.freepngimg.com%2fdownload%2fgreen_tick%2f27880-5-green-tick-clipart.png&ehk=23wDe1sjBvA6xbwbaYRnxtE0tnwNzqbafc3L5kmYcms%3d&risl=&pid=ImgRaw&r=0")
         embed.set_footer(text=f"UID : {uid}, coded by Ivan")
         await interaction.response.send_message(embed=embed)
+
+        ing_chat = bot.get_channel(991364879116153023)
+        
+        if 'ban' in punishment.lower():
+            await ing_chat.send(f"BAN: Tribe Name: {tribe_name} has been banned for : {reason}!")
+        else:
+            await ing_chat.send(f"PUNISHMENT: Tribe Name:{tribe_name} has been punished!, Warnings: {warnings}{warning_type}, Reason: {reason}")
+
         return
     except Exception as e:
         embed = discord.Embed(title="PUNISHMENT FUNCTION",color=discord.Color.red())
@@ -654,7 +666,7 @@ async def information(interaction : discord.Interaction):
 
     embed.add_field(name=f"Seasonal warnings",value=TotalSeasonals,inline=True)
     embed.add_field(name=f"Permanent warnings",value=TotalPermanent,inline=True)
-    embed.add_field(name=f"Verbal warnings",value=TotalVerbals,inline=True)
+    embed.add_field(name=f"Verbal warningsw",value=TotalVerbals,inline=True)
 
     embed.add_field(name=f"Total banned users",value=len(bannedUsers),inline=False)
     embed.add_field(name=f"Total Authorized users",value=TotalUsers,inline=True)
