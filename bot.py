@@ -23,6 +23,7 @@ from Utils.bot.BanPage import BanPage
 from Utils.database.GetBans import GetBans
 from Utils.bot.CheckForTempBans import SearchForTerminateBan
 from Utils.Debug.Messages import Succed, info, Alert
+from Utils.Api.Handler import Run
 
 from dotenv import load_dotenv, dotenv_values
 
@@ -715,5 +716,5 @@ async def warn_autocomplete(interaction : discord.Interaction, current: int) -> 
     
     return data
 
-
+Run()
 bot.run(token)
